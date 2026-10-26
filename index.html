@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexaFlix - Nonton Film</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --red: #e50914;
+  --bg: #09090b;
+  --card: #18181b;
+  --text: #ffffff;
+  --muted: #a1a1aa;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+header {
+  height: 70px;
+  padding: 0 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: rgba(9,9,11,.96);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  color: var(--red);
+  font-size: 27px;
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+
+nav {
+  display: flex;
+  gap: 22px;
+}
+
+nav a {
+  color: #ddd;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+nav a:hover {
+  color: white;
+}
+
+.search {
+  width: 220px;
+  padding: 10px 13px;
+  border: 1px solid #414149;
+  border-radius: 7px;
+  background: #18181b;
+  color: white;
+  outline: none;
+}
+
+.hero {
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  padding: 60px 7%;
+  position: relative;
+  background:
+    linear-gradient(90deg, #09090b 0%, rgba(9,9,11,.8) 42%, transparent 100%),
+    linear-gradient(0deg, #09090b 0%, transparent 40%),
+    url("https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=1800&q=85")
+    center/cover;
+}
+
+.hero-content {
+  max-width: 560px;
+}
+
+.tag {
+  color: #ff626a;
+  font-weight: bold;
+  letter-spacing: 3px;
+  font-size: 12px;
+  margin-bottom: 18px;
+}
+
+.hero h1 {
+  font-size: clamp(38px, 6vw, 66px);
+  line-height: 1.05;
+  margin-bottom: 17px;
+}
+
+.hero p {
+  color: #d4d4d8;
+  line-height: 1.8;
+  max-width: 480px;
+  margin-bottom: 25px;
+}
+
+.buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 0;
+  border-radius: 6px;
+  padding: 13px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.btn:hover {
+  transform: scale(1.04);
+}
+
+.btn-red {
+  background: var(--red);
+  color: white;
+}
+
+.btn-light {
+  background: #ffffff;
+  color: #111;
+}
+
+main {
+  padding: 10px 6% 50px;
+}
+
+.section {
+  margin-top: 30px;
+  scroll-margin-top: 85px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  gap: 10px;
+}
+
+.section-heading h2 {
+  font-size: 21px;
+}
+
+.section-heading span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.categories {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.category {
+  border: 1px solid #35353b;
+  border-radius: 30px;
+  background: #17171b;
+  color: #eee;
+  padding: 10px 17px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.category.active,
+.category:hover {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 20px 15px;
+}
+
+.movie {
+  min-width: 0;
+  cursor: pointer;
+  transition: transform .25s;
+}
+
+.movie:hover {
+  transform: translateY(-5px);
+}
+
+.poster {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: 9px;
+  background: var(--card);
+}
+
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s;
+}
+
+.movie:hover img {
+  transform: scale(1.07);
+}
+
+.rating {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  background: rgba(0,0,0,.75);
+  font-size: 11px;
+}
+
+.play-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.1);
+  font-size: 40px;
+  opacity: 0;
+  transition: .2s;
+}
+
+.movie:hover .play-icon {
+  opacity: 1;
+}
+
+.movie h3 {
+  font-size: 14px;
+  margin-top: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movie-info {
+  display: flex;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 7px;
+}
+
+.empty {
+  color: var(--muted);
+  padding: 30px 0;
+  display: none;
+}
+
+footer {
+  border-top: 1px solid #27272a;
+  padding: 30px 6%;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  line-height: 2;
+}
+
+/* Pemutar film */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(0,0,0,.92);
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-box {
+  width: min(850px, 100%);
+  background: #17171b;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal-top {
+  padding: 15px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-top button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+video {
+  display: block;
+  width: 100%;
+  max-height: 65vh;
+  background: black;
+}
+
+.modal-caption {
+  padding: 18px;
+  color: #d4d4d8;
+  line-height: 1.6;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .movie-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  nav {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  header {
+    height: auto;
+    min-height: 65px;
+    padding: 14px 5%;
+    flex-wrap: wrap;
+  }
+  .logo {
+    font-size: 23px;
+  }
+  nav {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+  }
+  nav a {
+    font-size: 12px;
+  }
+  .search {
+    width: 145px;
+    padding: 9px;
+  }
+  .hero {
+    min-height: 400px;
+    padding: 45px 6%;
+    background-position: center;
+  }
+  .hero p {
+    font-size: 13px;
+  }
+  main {
+    padding: 10px 5% 35px;
+  }
+  .movie-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 12px;
+  }
+  .movie h3 {
+    font-size: 13px;
+  }
+  .section-heading h2 {
+    font-size: 18px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">NEXAFLIX<span style="color:white">.</span></div>
+
+  <nav>
+    <a href="#home">Beranda</a>
+    <a href="#popular">Populer</a>
+    <a href="#movies">Film</a>
+  </nav>
+
+  <input
+    type="search"
+    id="search"
+    class="search"
+    placeholder="Cari film..."
+    aria-label="Cari film"
+  >
+</header>
+
+<section class="hero" id="home">
+  <div class="hero-content">
+    <div class="tag">NEXAFLIX ORIGINAL</div>
+    <h1>THE LAST<br>HORIZON</h1>
+    <p>
+      Ketika dunia berubah menjadi misteri, seorang petualang
+      harus menemukan jawaban sebelum semuanya terlambat.
+      Sebuah perjalanan penuh aksi, rahasia, dan kejutan.
+    </p>
+    <div class="buttons">
+      <button class="btn btn-red" onclick="playMovie('The Last Horizon')">
+        ▶ &nbsp; Tonton Sekarang
+      </button>
+      <button class="btn btn-light" onclick="showInfo()">
+        ⓘ &nbsp; Selengkapnya
+      </button>
+    </div>
+  </div>
+</section>
+
+<main>
+  <section class="section">
+    <div class="section-heading">
+      <h2>Jelajahi Genre</h2>
+    </div>
+    <div class="categories" id="categories">
+      <button class="category active" data-genre="Semua">Semua</button>
+      <button class="category" data-genre="Action">Action</button>
+      <button class="category" data-genre="Anime">Anime</button>
+      <button class="category" data-genre="Drama">Drama</button>
+      <button class="category" data-genre="Horror">Horror</button>
+      <button class="category" data-genre="Sci-Fi">Sci-Fi</button>
+      <button class="category" data-genre="Adventure">Adventure</button>
+    </div>
+  </section>
+
+  <section class="section" id="popular">
+    <div class="section-heading">
+      <h2>🔥 Film Pilihan</h2>
+      <span>Rekomendasi untukmu</span>
+    </div>
+    <div class="movie-grid" id="featured"></div>
+  </section>
+
+  <section class="section" id="movies">
+    <div class="section-heading">
+      <h2>🎬 Semua Film</h2>
+      <span id="resultCount"></span>
+    </div>
+    <div class="movie-grid" id="movieList"></div>
+    <div class="empty" id="empty">
+      Film tidak ditemukan. Coba judul lain.
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="logo">NEXAFLIX.</div>
+  <p>Tempat menemukan cerita dan petualangan baru.</p>
+  <p>© 2026 NexaFlix. Website demo untuk hiburan.</p>
+</footer>
+
+<div class="modal" id="playerModal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <strong id="playerTitle">Pemutar Film</strong>
+      <button onclick="closePlayer()" aria-label="Tutup">&times;</button>
+    </div>
+
+    <video id="videoPlayer" controls playsinline
+      poster="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1000&q=80">
+      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+      Browser kamu tidak mendukung pemutar video.
+    </video>
+
+    <div class="modal-caption" id="playerCaption">
+      Video contoh. Tambahkan sumber video film yang legal untuk memutar film pilihanmu.
+    </div>
+  </div>
+</div>
+
+<script>
+const movies = [
+  {
+    title: "Shadow Hunter",
+    genre: "Action",
+    year: 2026,
+    rating: "8.7",
+    image: "photo-1519608487953-e999c86e7455",
+    desc: "Seorang pemburu menghadapi rahasia yang mengubah hidupnya."
+  },
+  {
+    title: "Dream Journey",
+    genre: "Anime",
+    year: 2025,
+    rating: "9.1",
+    image: "photo-1470252649378-9c29740c9fa8",
+    desc: "Petualangan menuju dunia yang hanya ada dalam mimpi."
+  },
+  {
+    title: "Dark Forest",
+    genre: "Horror",
+    year: 2025,
+    rating: "8.2",
+    image: "photo-1448375240586-882707db888b",
+    desc: "Hutan sunyi menyimpan misteri yang belum terpecahkan."
+  },
+  {
+    title: "Beyond Earth",
+    genre: "Sci-Fi",
+    year: 2026,
+    rating: "8.9",
+    image: "photo-1446776811953-b23d57bd21aa",
+    desc: "Misi luar angkasa membawa manusia pada penemuan besar."
+  },
+  {
+    title: "Blue Horizon",
+    genre: "Drama",
+    year: 2024,
+    rating: "8.4",
+    image: "photo-1473116763249-2faaef81ccda",
+    desc: "Kisah tentang persahabatan, harapan, dan kesempatan kedua."
+  },
+  {
+    title: "Lost Kingdom",
+    genre: "Adventure",
+    year: 2025,
+    rating: "8.6",
+    image: "photo-1511497584788-876760111969",
+    desc: "Perjalanan menemukan kerajaan yang hilang dari peta."
+  },
+  {
+    title: "Night Chase",
+    genre: "Action",
+    year: 2026,
+    rating: "8.5",
+    image: "photo-1519608487953-e999c86e7455",
+    desc: "Misi berbahaya dimulai saat malam tiba."
+  },
+  {
+    title: "Silent Valley",
+    genre: "Horror",
+    year: 2024,
+    rating: "7.9",
+    image: "photo-1500530855697-b586d89ba3ee",
+    desc: "Sebuah lembah menyimpan kejadian yang sulit dijelaskan."
+  },
+  {
+    title: "Cosmic World",
+    genre: "Sci-Fi",
+    year: 2025,
+    rating: "8.8",
+    image: "photo-1462331940025-496dfbfc7564",
+    desc: "Jelajahi galaksi dan rahasia alam semesta."
+  },
+  {
+    title: "Summer Story",
+    genre: "Drama",
+    year: 2026,
+    rating: "8.1",
+    image: "photo-1500534623283-312aade485b7",
+    desc: "Cerita hangat tentang kenangan di musim panas."
+  }
+];
+
+let selectedGenre = "Semua";
+
+const featured = document.getElementById("featured");
+const movieList = document.getElementById("movieList");
+const search = document.getElementById("search");
+
+function posterURL(id) {
+  return `https://images.unsplash.com/${id}?auto=format&fit=crop&w=500&q=80`;
+}
+
+function createMovie(movie) {
+  const card = document.createElement("article");
+  card.className = "movie";
+
+  const poster = document.createElement("div");
+  poster.className = "poster";
+
+  const img = document.createElement("img");
+  img.src = posterURL(movie.image);
+  img.alt = "Gambar ilustrasi " + movie.title;
+  img.loading = "lazy";
+
+  const rating = document.createElement("span");
+  rating.className = "rating";
+  rating.textContent = "⭐ " + movie.rating;
+
+  const play = document.createElement("div");
+  play.className = "play-icon";
+  play.textContent = "▶";
+
+  const title = document.createElement("h3");
+  title.textContent = movie.title;
+
+  const info = document.createElement("div");
+  info.className = "movie-info";
+  info.textContent = movie.year + " • " + movie.genre;
+
+  poster.append(img, rating, play);
+  card.append(poster, title, info);
+
+  card.addEventListener("click", () => playMovie(movie.title));
+  return card;
+}
+
+function renderMovies() {
+  const query = search.value.toLowerCase().trim();
+
+  const filtered = movies.filter(movie => {
+    const matchGenre =
+      selectedGenre === "Semua" || movie.genre === selectedGenre;
+
+    const matchSearch =
+      movie.title.toLowerCase().includes(query) ||
+      movie.genre.toLowerCase().includes(query);
+
+    return matchGenre && matchSearch;
+  });
+
+  movieList.replaceChildren(...filtered.map(createMovie));
+  document.getElementById("resultCount").textContent =
+    filtered.length + " film";
+
+  document.getElementById("empty").style.display =
+    filtered.length ? "none" : "block";
+
+  featured.replaceChildren(
+    ...movies.slice(0, 5).map(createMovie)
+  );
+}
+
+document.querySelectorAll(".category").forEach(button => {
+  button.addEventListener("click", () => {
+    selectedGenre = button.dataset.genre;
+
+    document.querySelectorAll(".category").forEach(item => {
+      item.classList.toggle("active", item === button);
+    });
+
+    renderMovies();
+  });
+});
+
+search.addEventListener("input", renderMovies);
+
+function playMovie(title) {
+  const movie = movies.find(item => item.title === title);
+
+  document.getElementById("playerTitle").textContent = title;
+  document.getElementById("playerCaption").textContent =
+    movie
+      ? movie.desc + " Video yang diputar saat ini adalah video contoh."
+      : "Film unggulan. Video yang diputar saat ini adalah video contoh.";
+
+  const modal = document.getElementById("playerModal");
+  modal.classList.add("show");
+
+  const video = document.getElementById("videoPlayer");
+  video.pause();
+  video.currentTime = 0;
+
+  video.play().catch(() => {
+    // Pengguna bisa menekan tombol play secara manual.
+  });
+}
+
+function closePlayer() {
+  const video = document.getElementById("videoPlayer");
+  video.pause();
+  document.getElementById("playerModal").classList.remove("show");
+}
+
+function showInfo() {
+  alert(
+    "THE LAST HORIZON\n\n" +
+    "Film petualangan fiksi tentang perjalanan penuh misteri.\n\n" +
+    "Catatan: video film asli perlu ditambahkan secara terpisah."
+  );
+}
+
+document.getElementById("playerModal").addEventListener("click", event => {
+  if (event.target.id === "playerModal") closePlayer();
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closePlayer();
+});
+
+renderMovies();
+</script>
+
+</body>
+</html>
